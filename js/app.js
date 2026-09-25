@@ -1,5 +1,5 @@
 import { parseCollection, normalizeName } from './parser.js';
-import { fetchCards } from './scryfall.js';
+import { fetchCards, pingScryfall } from './scryfall.js';
 import { fetchEdhrec, edhrecPageUrl, EDHREC_TAG_LABELS } from './edhrec.js';
 import { canBeCommander, primaryType, isBasicLand, detectRoles, ROLE_LABELS } from './roles.js';
 import { buildDeck, deckToText } from './builder.js';
@@ -97,7 +97,11 @@ async function importCollection(text, { save = true } = {}) {
       label.textContent = `Recherche des cartes sur Scryfall… ${done}/${total}`;
     });
   } catch (e) {
-    status.replaceChildren(h('span', { class: 'err', text: `Impossible de joindre Scryfall (${e.message}). Vérifie ta connexion puis réessaie.` }));
+    const reachable = await pingScryfall();
+    const msg = reachable
+      ? `Scryfall a refusé la recherche (${e.message}). Réessaie dans une minute.`
+      : "Ton navigateur n'arrive pas à joindre api.scryfall.com. Désactive le bloqueur de pub ou l'extension de confidentialité pour ce site, ou essaie depuis un autre réseau (certains réseaux d'école ou d'entreprise bloquent ce site).";
+    status.replaceChildren(h('span', { class: 'err', text: msg }));
     $('collection-import').disabled = false;
     return;
   }

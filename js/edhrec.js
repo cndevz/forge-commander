@@ -46,7 +46,7 @@ async function getJson(url) {
   let lastError = null;
   for (const wrap of PROXIES) {
     try {
-      const res = await fetch(wrap(url), { headers: { Accept: 'application/json' } });
+      const res = await fetch(wrap(url));
       if (res.status === 404) throw Object.assign(new Error('not_found'), { notFound: true });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return await res.json();

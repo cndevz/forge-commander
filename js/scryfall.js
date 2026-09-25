@@ -102,29 +102,65 @@ export function slimCard(c) {
   };
 }
 
-async function postCollection(identifiers) {
+// Uniquement des requêtes GET sans en-tête particulier : le navigateur n'a pas besoin
+// de demander d'autorisation préalable (CORS) à Scryfall.
+async function getJson(url) {
   for (let attempt = 0; attempt < 3; attempt++) {
-    const res = await fetch(`${API}/cards/collection`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-      body: JSON.stringify({ identifiers }),
-    });
+    const res = await fetch(url);
     if (res.status === 429) {
       await sleep(1000 * (attempt + 1));
       continue;
     }
+    if (res.status === 404 || res.status === 400) return null; // introuvable ou requête invalide
     if (!res.ok) throw new Error(`Scryfall a répondu ${res.status}`);
     return res.json();
   }
   throw new Error('Scryfall limite le nombre de requêtes, réessaie dans une minute.');
 }
 
-async function fetchNamedFuzzy(name) {
-  const res = await fetch(`${API}/cards/named?fuzzy=${encodeURIComponent(name)}`, {
-    headers: { Accept: 'application/json' },
-  });
-  if (!res.ok) return null;
-  return res.json();
+// Recherche Scryfall paginée ; renvoie toutes les cartes trouvées.
+async function search(query, unique) {
+  const out = [];
+  let url = `${API}/cards/search?unique=${unique}&q=${encodeURIComponent(query)}`;
+  while (url) {
+    const page = await getJson(url);
+    if (!page) break;
+    out.push(...(page.data || []));
+    url = page.has_more ? page.next_page : null;
+    if (url) await sleep(110);
+  }
+  return out;
+}
+
+const quote = (s) => `"${s.replace(/"/g, '')}"`;
+
+// Découpe en requêtes d'environ 1 500 caractères pour rester sous la limite d'URL.
+function chunkQueries(items, toTerm) {
+  const chunks = [];
+  let cur = [];
+  let len = 0;
+  for (const it of items) {
+    const term = toTerm(it);
+    if (cur.length && len + term.length > 1500) {
+      chunks.push(cur);
+      cur = [];
+      len = 0;
+    }
+    cur.push({ it, term });
+    len += term.length + 4;
+  }
+  if (cur.length) chunks.push(cur);
+  return chunks;
+}
+
+// Vérifie si Scryfall répond (pour un message d'erreur utile).
+export async function pingScryfall() {
+  try {
+    const res = await fetch(`${API}/cards/named?exact=Sol%20Ring`);
+    return res.ok;
+  } catch {
+    return false;
+  }
 }
 
 // requests : [{ key, name, set?, cn? }]
@@ -135,55 +171,49 @@ export async function fetchCards(requests, onProgress = () => {}) {
   const total = requests.length;
   onProgress(result.size, total);
   const toCache = [];
-
-  const matchesRequest = (card, r) =>
+  const keep = (r, card) => {
+    const slim = slimCard(card);
+    result.set(r.key, slim);
+    toCache.push([r.key, slim]);
+  };
+  const matchesName = (card, r) =>
     normalizeName(card.name) === r.key ||
     (card.card_faces && card.card_faces.some((f) => normalizeName(f.name) === r.key));
 
-  // Passe 1 : impression exacte (extension + numéro) quand on l'a, sinon le nom.
-  // Passe 2 : le nom seul. Passe 3 : recherche approximative, carte par carte.
-  for (const pass of [1, 2]) {
-    const next = [];
-    for (let i = 0; i < pending.length; i += 75) {
-      const chunk = pending.slice(i, i + 75);
-      const ids = chunk.map((r) =>
-        pass === 1 && r.set && r.cn ? { set: r.set, collector_number: r.cn } : { name: r.name.split(' // ')[0] }
-      );
-      const data = await postCollection(ids);
-      const found = data.data || [];
-      const used = new Set();
-      for (const r of chunk) {
-        const card = found.find((c, idx) => !used.has(idx) && matchesRequest(c, r));
-        if (card) {
-          used.add(found.indexOf(card));
-          const slim = slimCard(card);
-          result.set(r.key, slim);
-          toCache.push([r.key, slim]);
-        } else {
-          next.push(r);
-        }
-      }
-      onProgress(result.size, total);
-      await sleep(110);
-    }
-    pending = next;
-    if (!pending.length) break;
-  }
-
-  const notFound = [];
-  for (const r of pending.slice(0, 40)) {
-    const card = await fetchNamedFuzzy(r.name);
-    if (card) {
-      const slim = slimCard(card);
-      result.set(r.key, slim);
-      toCache.push([r.key, slim]);
-    } else {
-      notFound.push(r.name);
+  // Passe 1 : l'impression exacte (extension + numéro), pour avoir la bonne illustration.
+  const withPrinting = pending.filter((r) => r.set && r.cn);
+  for (const chunk of chunkQueries(withPrinting, (r) => `(e:${r.set} cn:${quote(r.cn)})`)) {
+    const found = await search(chunk.map((c) => c.term).join(' or '), 'prints');
+    for (const { it: r } of chunk) {
+      const card = found.find((c) => c.set === r.set && c.collector_number === r.cn && matchesName(c, r));
+      if (card) keep(r, card);
     }
     onProgress(result.size, total);
     await sleep(110);
   }
-  for (const r of pending.slice(40)) notFound.push(r.name);
+  pending = pending.filter((r) => !result.has(r.key));
+
+  // Passe 2 : le nom exact.
+  for (const chunk of chunkQueries(pending, (r) => `!${quote(r.name.split(' // ')[0])}`)) {
+    const found = await search(chunk.map((c) => c.term).join(' or '), 'cards');
+    for (const { it: r } of chunk) {
+      const card = found.find((c) => matchesName(c, r));
+      if (card) keep(r, card);
+    }
+    onProgress(result.size, total);
+    await sleep(110);
+  }
+  pending = pending.filter((r) => !result.has(r.key));
+
+  // Passe 3 : recherche approximative, carte par carte (fautes de frappe, noms traduits…).
+  const notFound = [];
+  for (const [i, r] of pending.entries()) {
+    const card = i < 40 ? await getJson(`${API}/cards/named?fuzzy=${encodeURIComponent(r.name)}`) : null;
+    if (card) keep(r, card);
+    else notFound.push(r.name);
+    onProgress(result.size, total);
+    if (i < 40) await sleep(110);
+  }
 
   await cachePutMany(toCache);
   return { cards: result, notFound };
