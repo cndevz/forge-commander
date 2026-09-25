@@ -60,6 +60,14 @@
       <div class="tabs" role="tablist">
         <button type="button" role="tab" id="tab-deck" aria-selected="true" aria-controls="panel-deck">Deck</button>
         <button type="button" role="tab" id="tab-suggest" aria-selected="false" aria-controls="panel-suggest">Suggestions EDHREC</button>
+        <div class="size-switch" role="group" aria-label="Taille des cartes">
+          <span>Taille des cartes</span>
+          <span class="seg">
+            <button type="button" data-size="s" aria-pressed="false">Petites</button>
+            <button type="button" data-size="m" aria-pressed="true">Moyennes</button>
+            <button type="button" data-size="l" aria-pressed="false">Grandes</button>
+          </span>
+        </div>
       </div>
       <div id="panel-deck" role="tabpanel" aria-labelledby="tab-deck"></div>
       <div id="panel-suggest" role="tabpanel" aria-labelledby="tab-suggest" hidden></div>

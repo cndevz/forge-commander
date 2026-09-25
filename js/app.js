@@ -540,6 +540,13 @@ async function init() {
     importCollection(text);
   });
   $('commander-filter').addEventListener('input', renderCommanders);
+  const setSize = (size) => {
+    document.documentElement.dataset.size = size;
+    document.querySelectorAll('.size-switch button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.size === size)));
+    store.set('size', size);
+  };
+  document.querySelectorAll('.size-switch button').forEach((b) => b.addEventListener('click', () => setSize(b.dataset.size)));
+  setSize(store.get('size', 'm'));
   $('generate').addEventListener('click', generate);
   const range = $('randomness');
   range.value = store.get('randomness', 30);
