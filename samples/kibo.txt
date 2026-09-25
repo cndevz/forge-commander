@@ -1,0 +1,90 @@
+// COMMANDER
+1 Kibo, Uktabi Prince (J22) 40
+
+1 Abrade (TDC) 203
+1 Ancestral Anger (INR) 141
+1 Ancient Grudge (MM3) 88
+1 Arcane Signet (TLE) 315
+1 Beast Within (EOC) 93
+1 Bitter Work (TLA) 210
+1 Bucknard's Everfull Purse (AFC) 57
+1 Chomping Changeling (ECL) 172
+1 Clockwork Percussionist (DSK) 130
+1 Command Tower (TDC) 107
+1 Commander's Sphere (ECC) 139
+1 Decimate (BLC) 251
+1 Earthbender Ascension (TLA) 175
+1 Elephant-Mandrill (TLE) 138
+1 Evolution Charm (TSR) 202
+1 Ferocious Tigorilla (IKO) 115
+1 Flopsie, Bumi's Buddy (TLA) 179
+1 Forest (DDL) 78
+1 Forest (ISD) 262
+3 Forest (WOE) 276
+1 Forest (MKM) 286
+1 Forest (FDN) 291
+2 Forest (FDN) 281
+1 Forest (FDN) 290
+1 Forest (FDN) 280
+1 Forest (EOE) 275
+2 Forest (TLA) 291
+4 Forest (TLA) 286
+1 Forest (ECL) 273
+1 Gearbane Orangutan (MKM) 129
+1 Gorilla Shaman (MH2) 280
+1 Gorilla War Cry (ALL) 73a
+1 Hardened Scales (LCC) 243
+1 Hellkite Tyrant (FIC) 295
+1 Incubation Druid (MOC) 302
+1 Inspiring Call (40K) 217
+1 Jet's Brainwashing (TLA) 143
+1 Kami of Whispered Hopes (MOM) 196
+1 Kird Chieftain (M15) 151
+1 Kogla and Yidaro (MOM) 244
+1 Kogla, the Titan Ape (IKO) 162
+1 Level Up (TMC) 31
+1 Liquimetal Coating (CM2) 197
+1 Liquimetal Torque (MH2) 228
+1 Magewright's Stone (RVR) 462
+1 Manamorphose (2XM) 208
+1 Marvin, Murderous Mimic (DSK) 367
+1 Meltstrider Eulogist (EOE) 197
+1 Monkey Cage (MMQ) 307
+2 Mountain (VOW) 274
+3 Mountain (WOE) 273
+2 Mountain (BLB) 375
+1 Mountain (FDN) 289
+1 Mountain (FDN) 278
+2 Mountain (FDN) 288
+1 Mountain (EOE) 274
+1 Mycosynth Lattice (BBD) 241
+1 Omashu City (TLA) 275
+1 Origin of Metalbending (TLA) 187
+1 Rockfall Vale (TDC) 387
+1 Rugged Highlands (FDN) 265
+1 Ruinous Rampage (EOE) 158
+1 Scrounging Bandar (CMR) 252
+1 Shattering Spree (RVR) 456
+1 Silverback Elder (DMU) 177
+1 Silverback Shaman (CMR) 255
+1 Simian Simulacrum (BRO) 205
+1 Simian Spirit Guide (A25) 148
+1 Slagstorm (FDN) 207
+1 Smellerbee, Rebel Fighter (TLE) 125
+1 Snakeskin Veil (FDN) 233
+1 Sol Ring (TLE) 316
+1 Springleaf Parade (ECC) 19
+1 Storm the Seedcore (MOM) 206
+1 Surrak and Goreclaw (MOM) 337
+1 Swiftfoot Boots (TLE) 317
+1 Taurean Mauler (TDC) 238
+1 Terminal Velocity (EOE) 163
+1 Thriving Bluff (ECC) 170
+1 Uktabi Orangutan (6ED) 260
+1 Uncharted Haven (FDN) 564
+1 Untimely Malfunction (DSK) 161
+1 Vandalblast (OTC) 183
+1 Viridian Revel (SOM) 132
+1 Weftstalker Ardent (EOE) 169
+1 Whispersilk Cloak (10E) 345
+1 Yavimaya Steelcrusher (DMU) 152
